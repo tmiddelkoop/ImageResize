@@ -195,13 +195,13 @@ void CResizeImage::ScaleDown(void)
 		newline += newrowsize;
 	}
 
-	delete rows;
-	delete nrxA;
-	delete ixA;
-	delete iyA;
-	delete dxA;
-	delete dyA;
-	delete dxB;
+	delete[] rows;
+	delete[] nrxA;
+	delete[] ixA;
+	delete[] iyA;
+	delete[] dxA;
+	delete[] dyA;
+	delete[] dxB;
 }
 
 void CResizeImage::ScaleDownPreCalculate(int* &ixA, float* &dxA, int* &nrxA, float* &dxB)
@@ -302,18 +302,18 @@ void CResizeImage::ScaleUp(void)
 		}
     }
 
-	delete startx;
-	delete endx;
-	delete starty;
-	delete endy;
+	delete[] startx;
+	delete[] endx;
+	delete[] starty;
+	delete[] endy;
     for (int t1 = 0; t1 < newwidth; t1++)
-        delete hweights[t1];
-    delete hweights;
+        delete[] hweights[t1];
+    delete[] hweights;
     for (int t1 = 0; t1 < newheight; t1++)
-        delete vweights[t1];
-    delete vweights;
-	delete hdensity;
-	delete vdensity;
+        delete[] vweights[t1];
+    delete[] vweights;
+	delete[] hdensity;
+	delete[] vdensity;
 }
 
 void CResizeImage::ScaleUpPreCalculate(
