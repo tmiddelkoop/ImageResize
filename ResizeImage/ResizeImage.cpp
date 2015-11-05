@@ -125,7 +125,7 @@ void CResizeImage::ScaleDown(void)
 	unsigned char *newline = newbuffer, *c1, *c2;
 	float starty, endy = 0.0f, dy, diffY;
 	int pos, nrx, nrx1, nry, t3, t6;
-	float sum1, sum2, sum3, f, area;
+	float sum1, sum2, sum3, sum4, f, area;
 
 	ScaleDownPreCalculate(ixA, dxA, nrxA, dxB);
 
@@ -162,7 +162,7 @@ void CResizeImage::ScaleDown(void)
 		{
 			t3 = nrxA[t2];
 			area = (1.0f / (dxB[t2] * diffY)) * GAMMASIZE;
-			sum1 = sum2 = sum3 = 0.0f;
+			sum1 = sum2 = sum3 = sum4 = 0.0f;
 
 			for (int t4 = 0; t4 < nry; t4++)
 			{
@@ -179,6 +179,7 @@ void CResizeImage::ScaleDown(void)
 					sum1 += togamma[c2[0]] * f;
 					sum2 += togamma[c2[1]] * f;
 					sum3 += togamma[c2[2]] * f;
+					sum4 += togamma[c2[2]] * f;
 
 					nrx1++;
 				}
@@ -187,6 +188,7 @@ void CResizeImage::ScaleDown(void)
 			newline[t6 + 0] = fromgamma[(int)(sum1 * area)];
 			newline[t6 + 1] = fromgamma[(int)(sum2 * area)];
 			newline[t6 + 2] = fromgamma[(int)(sum3 * area)];
+			newline[t6 + 3] = fromgamma[(int)(sum4 * area)];
 
 			nrx += t3;
 			t6  += newbpp;
@@ -207,7 +209,7 @@ void CResizeImage::ScaleDown(void)
 void CResizeImage::ScaleDownPreCalculate(int* &ixA, float* &dxA, int* &nrxA, float* &dxB)
 {
 	int nrcols = (int)ceil(fx + 1.0f);
-	int nrx = 0, nrx1;
+	int nrx = 0, nrx1 = 0;
 	float startx = 0.0f;
 	float endx = fx;
 
@@ -252,7 +254,7 @@ void CResizeImage::ScaleUp(void)
 	float **hweights, **vweights;
 	float *hdensity, *vdensity;
 	float *vweight, *hweight;
-	float sumh1, sumh2, sumh3, sumv1, sumv2, sumv3;
+	float sumh1, sumh2, sumh3, sumh4, sumv1, sumv2, sumv3, sumv4;
 
 	ScaleUpPreCalculate(startx, endx, starty, endy, hweights, vweights, hdensity, vdensity);
 
@@ -266,14 +268,14 @@ void CResizeImage::ScaleUp(void)
 			nmaxh = endx[t2] - startx[t2];
 			unsigned char* ypos = buffer + starty[t1] * rowsize;
 
-			sumv1 = sumv2 = sumv3 = 0.0f;
+			sumv1 = sumv2 = sumv3 = sumv4 = 0.0f;
             vweight = vweights[t1];
 
 			for (int t3 = 0; t3 < nmaxv; t3++)
 			{
 				unsigned char *xpos = ypos + startx[t2] * bpp;
 
-				sumh1 = sumh2 = sumh3 = 0.0f;
+				sumh1 = sumh2 = sumh3 = sumh4 = 0.0f;
                 hweight = hweights[t2];
 
 				for (int t4 = 0; t4 < nmaxh; t4++)
@@ -281,6 +283,7 @@ void CResizeImage::ScaleUp(void)
 					sumh1 += *hweight * togamma[xpos[0]];
 					sumh2 += *hweight * togamma[xpos[1]];
 					sumh3 += *hweight * togamma[xpos[2]];
+					sumh4 += *hweight * togamma[xpos[3]];
 
 					xpos += bpp;
                     hweight++;
@@ -289,6 +292,7 @@ void CResizeImage::ScaleUp(void)
 				sumv1 += *vweight * sumh1;
 				sumv2 += *vweight * sumh2;
 				sumv3 += *vweight * sumh3;
+				sumv4 += *vweight * sumh4;
 
 				ypos += rowsize;
                 vweight++;
@@ -297,6 +301,7 @@ void CResizeImage::ScaleUp(void)
 			line[0] = fromgamma[(int)(CAP(sumv1) * GAMMASIZE)];
 			line[1] = fromgamma[(int)(CAP(sumv2) * GAMMASIZE)];
 			line[2] = fromgamma[(int)(CAP(sumv3) * GAMMASIZE)];
+			line[3] = fromgamma[(int)(CAP(sumv4) * GAMMASIZE)];
 
             line += newbpp;
 		}
